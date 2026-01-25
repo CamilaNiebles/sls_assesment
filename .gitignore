@@ -1,0 +1,31 @@
+# Node / npm
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# Build output
+dist/
+.build/
+.serverless/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo
+
+# OS
+.DS_Store
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/

@@ -1,0 +1,29 @@
+{
+  "name": "sls_assesment",
+  "version": "1.0.0",
+  "description": "This project is a serverless REST API designed to manage **user notes**, allowing authenticated users to create, read, update, and delete their own notes.",
+  "main": "index.js",
+  "scripts": {
+		"start:dev": "ts-node-dev --respawn --transpile-only src/server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CamilaNiebles/sls_assesment.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CamilaNiebles/sls_assesment/issues"
+  },
+  "homepage": "https://github.com/CamilaNiebles/sls_assesment#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.10",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
