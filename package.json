@@ -9,7 +9,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "test": "jest",
-    "test:quick": "jest --runTestsByPath src --passWithNoTests",
+    "test:quick": "jest --changedSince=HEAD src --passWithNoTests",
     "test:coverage": "jest --coverage",
     "prepare": "husky"
   },

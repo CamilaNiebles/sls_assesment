@@ -4,10 +4,14 @@ export default {
   testEnvironment: 'node',
 
   // Pick up .spec.ts files
-  testMatch: ['**/*.spec.ts'],
+  testMatch: ['**/src/**/*.spec.ts'],
 
   // Treat TS files as ESM
   extensionsToTreatAsEsm: ['.ts'],
+
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
 
   // Clear mocks between tests
   clearMocks: true,
