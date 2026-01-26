@@ -1,8 +1,7 @@
-console.log("Starting app.ts");
-import express, { type Express } from "express";
-import { healthRouter } from "./controllers/health.router";
+import express, { type Express } from 'express';
+import { healthRouter } from './controllers/health.router';
 
-const app : Express = express();
+const app: Express = express();
 
 app.use((req, _res, next) => {
   console.log('Incoming request:', req.method, req.url);
@@ -10,7 +9,6 @@ app.use((req, _res, next) => {
 });
 
 app.use(express.json());
-
 
 app.use('/health-check', healthRouter);
 
