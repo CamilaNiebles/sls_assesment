@@ -1,5 +1,5 @@
 import express, { type Express } from 'express';
-import { healthRouter } from './controllers/health.router';
+import { healthRouter } from './controllers/health.router.js';
 
 const app: Express = express();
 

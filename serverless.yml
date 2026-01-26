@@ -1,0 +1,28 @@
+service: notes-api
+
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  stage: dev
+  environment:
+    NODE_ENV: development
+
+functions:
+  api:
+    handler: src/handlers/health.handler
+    events:
+      - httpApi:
+          path: /health-check
+          method: GET
+
+plugins:
+  - serverless-offline
+
+build:
+    format: esm
+    platform: node
+    target: node20
+    
