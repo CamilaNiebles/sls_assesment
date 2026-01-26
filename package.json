@@ -2,9 +2,8 @@
   "name": "sls_assesment",
   "version": "1.0.0",
   "description": "This project is a serverless REST API designed to manage **user notes**, allowing authenticated users to create, read, update, and delete their own notes.",
-  "main": "index.js",
   "scripts": {
-		"start:dev": "ts-node-dev --respawn --transpile-only src/server.ts"
+    "start:dev": "npx tsx --watch src/server.ts"
   },
   "repository": {
     "type": "git",
@@ -20,7 +19,7 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.10",
-    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
