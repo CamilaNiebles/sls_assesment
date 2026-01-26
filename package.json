@@ -1,0 +1,56 @@
+{
+  "name": "sls_assesment",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "This project is a serverless REST API designed to manage **user notes**, allowing authenticated users to create, read, update, and delete their own notes.",
+  "scripts": {
+    "start:dev": "npx tsx --watch src/server.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "test": "jest --coverage",
+    "test:quick": "jest --changedSince=HEAD src --passWithNoTests",
+    "test:coverage": "jest --coverage",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CamilaNiebles/sls_assesment.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CamilaNiebles/sls_assesment/issues"
+  },
+  "homepage": "https://github.com/CamilaNiebles/sls_assesment#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.10",
+    "@types/supertest": "^6.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.53.1",
+    "@typescript-eslint/parser": "^8.53.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-unused-imports": "^4.3.0",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "prettier": "^3.8.1",
+    "serverless-offline": "^14.4.0",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.6",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.1"
+  },
+  "dependencies": {
+    "@codegenie/serverless-express": "^4.17.1",
+    "express": "^5.2.1",
+    "serverless": "^4.31.0",
+    "serverless-http": "^4.0.0"
+  }
+}
