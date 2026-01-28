@@ -26,7 +26,7 @@
   "homepage": "https://github.com/CamilaNiebles/sls_assesment#readme",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@types/express": "^5.0.6",
+    "@types/aws-lambda": "^8.10.160",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.0.10",
     "@types/supertest": "^6.0.3",
@@ -40,6 +40,7 @@
     "husky": "^9.1.7",
     "jest": "^30.2.0",
     "prettier": "^3.8.1",
+    "serverless-esbuild": "^1.57.0",
     "serverless-offline": "^14.4.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.6",
@@ -48,8 +49,6 @@
     "typescript-eslint": "^8.53.1"
   },
   "dependencies": {
-    "@codegenie/serverless-express": "^4.17.1",
-    "express": "^5.2.1",
     "serverless": "^4.31.0",
     "serverless-http": "^4.0.0"
   }
