@@ -1,7 +1,7 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { getHealthStatus } from '../services/health.service.js';
 
-export const handler: APIGatewayProxyHandler = async () => {
+export const handler: APIGatewayProxyHandler = async (): Promise<APIGatewayProxyResult> => {
   const healthStatus = await getHealthStatus();
 
   return {
