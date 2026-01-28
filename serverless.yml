@@ -1,5 +1,6 @@
+# "org" ensures this Service is used with the correct Serverless Framework License Key.
+org: camilaniebles
 service: notes-api
-frameworkVersion: '3'
 
 provider:
   name: aws
@@ -19,13 +20,3 @@ functions:
 
 plugins:
   - serverless-offline
-  - serverless-esbuild
-
-custom:
-  esbuild:
-    bundle: true
-    minify: false
-    sourcemap: true
-    target: node20
-    platform: node
-    format: cjs
