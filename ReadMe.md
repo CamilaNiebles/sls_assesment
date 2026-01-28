@@ -17,3 +17,14 @@ API Gateway exposes REST endpoints and handles authentication using a **built-in
 This design avoids direct service proxy integrations between API Gateway and DynamoDB, keeping the application logic isolated, testable, and easier to maintain.
 
 ![architecture diagram](architecture_diagram.png)
+
+### Security note
+
+`npm audit` reports vulnerabilities originating from the Serverless Framework CLI
+dependencies (aws-sdk v2, tar, jsonpath-plus).
+
+These packages are used **only at development / deployment time** and are **not
+bundled nor deployed** with the Lambda runtime.
+
+Upgrading to Serverless v4 would introduce breaking changes and is intentionally
+avoided in this project.
