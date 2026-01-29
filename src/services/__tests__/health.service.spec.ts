@@ -37,4 +37,17 @@ describe('getHealthStatus', () => {
       },
     });
   });
+
+  it('should log an error when DynamoDB check fails', async () => {
+    const error = new Error('DynamoDB error');
+
+    jest.spyOn(dynamoDbClient, 'send').mockRejectedValue(error as never);
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    await getHealthStatus();
+
+    expect(consoleSpy).toHaveBeenCalledWith('DynamoDB health check failed', error);
+
+    consoleSpy.mockRestore();
+  });
 });
