@@ -23,6 +23,7 @@ provider:
   environment:
     NODE_ENV: ${self:provider.stage}
     NOTES_TABLE_NAME: ${self:service}-notes-${sls:stage}
+    IS_OFFLINE: false
 
 functions:
   health:

@@ -5,6 +5,7 @@ export default {
 
   // Pick up .spec.ts files
   testMatch: ['**/src/**/*.spec.ts'],
+  setupFiles: ['<rootDir>/jest.setup.cjs'],
 
   // Treat TS files as ESM
   extensionsToTreatAsEsm: ['.ts'],
