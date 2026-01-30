@@ -32,6 +32,9 @@ functions:
       - http:
           path: /health
           method: get
+  
+  custom:
+  notesTableName: notes-api-notes-${sls:stage}
 
 resources:
   Resources:
