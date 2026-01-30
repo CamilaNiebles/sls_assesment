@@ -7,8 +7,23 @@ provider:
   runtime: nodejs20.x
   region: us-east-1
   stage: ${opt:stage, 'dev'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:Query
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:DescribeTable
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-notes-${sls:stage}
   environment:
     NODE_ENV: ${self:provider.stage}
+    NOTES_TABLE_NAME: ${self:service}-notes-${sls:stage}
+    IS_OFFLINE: false
 
 functions:
   health:
@@ -17,6 +32,30 @@ functions:
       - http:
           path: /health
           method: get
+
+resources:
+  Resources:
+    NotesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-notes-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: cognitoId
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: cognitoId
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
+        Tags:
+          - Key: service
+            Value: ${self:service}
+          - Key: stage
+            Value: ${sls:stage}
+
 
 plugins:
   - serverless-offline

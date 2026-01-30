@@ -5,12 +5,13 @@
   "description": "This project is a serverless REST API designed to manage **user notes**, allowing authenticated users to create, read, update, and delete their own notes.",
   "scripts": {
     "start:dev": "npx tsx --watch src/server.ts",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "format": "prettier --write .",
     "test": "jest --coverage",
     "test:quick": "jest --changedSince=HEAD src --passWithNoTests",
     "test:coverage": "jest --coverage",
+    "db:local:setup": "tsx src/scripts/create-local-table.ts",
     "prepare": "husky"
   },
   "repository": {
@@ -49,6 +50,10 @@
     "typescript-eslint": "^8.53.1"
   },
   "dependencies": {
-    "serverless": "^4.31.2"
+    "@aws-sdk/client-dynamodb": "^3.978.0",
+    "@aws-sdk/util-dynamodb": "^3.978.0",
+    "dotenv": "^17.2.3",
+    "serverless": "^4.31.2",
+    "zod": "^4.3.6"
   }
 }

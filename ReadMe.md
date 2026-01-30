@@ -28,3 +28,43 @@ bundled nor deployed** with the Lambda runtime.
 
 Upgrading to Serverless v4 would introduce breaking changes and is intentionally
 avoided in this project.
+
+## 🧪 How to Test
+
+This project can be tested locally using Serverless Offline and DynamoDB Local.
+
+### Prerequisites
+
+- Node.js (v18+ recommended)
+- Docker
+
+### 1. Start DynamoDB Local
+
+DynamoDB is provided locally using the official Amazon Docker image.
+
+```bash
+docker compose up -d
+```
+
+### 2. Create the local DynamoDB table
+
+Since CloudFormation does not manage local resources, a bootstrap script is provided to create the required tables in DynamoDB Local.
+
+```bash
+npm run db:local:setup
+```
+
+### 3. Start the API and verify the health endpoint
+
+Run the application locally using Serverless Offline:
+
+```bash
+npx serverless offline
+```
+
+The API will be available at 
+```bash
+http://localhost:3000
+```
+A successful response should include the database status:
+
