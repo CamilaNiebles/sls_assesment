@@ -50,6 +50,12 @@ functions:
       - http:
           path: /notes/{id}
           method: put
+  deleteById:
+    handler: src/handlers/deleteById.handler
+    events:
+      - http:
+          path: /notes/{id}
+          method: delete
 
 resources:
   Resources:

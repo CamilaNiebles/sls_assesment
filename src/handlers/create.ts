@@ -1,6 +1,6 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResult } from 'aws-lambda';
 import { create } from '../services/notes.service.js';
-import { AuthenticatedRequestContext, resolveUserId } from '../config/utils.js';
+import { resolveUserId } from '../config/utils.js';
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResult> => {
   const data = validateData(event);
@@ -15,7 +15,6 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 };
 
 const validateData = (event: APIGatewayProxyEventV2) => {
-  const requestContext = event.requestContext as AuthenticatedRequestContext;
   const cognitoId = resolveUserId(event);
 
   if (!cognitoId) {

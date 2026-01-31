@@ -14,6 +14,11 @@ export interface UpdateNoteInput {
   content?: string;
 }
 
+export interface DeleteNoteInput {
+  cognitoId: string;
+  id: string;
+}
+
 export const create = async (data: newNote) => {
   const notesRepository = new NotesRepository();
 
@@ -91,6 +96,26 @@ export const updateByUser = async (data: UpdateNoteInput) => {
   } catch (error: any) {
     console.error('Update note failed:', error);
 
+    return {
+      statusCode: error.statusCode ?? 500,
+      body: JSON.stringify({
+        message: error.message ?? 'Internal server error',
+      }),
+    };
+  }
+};
+
+export const deleteById = async (data: DeleteNoteInput) => {
+  const notesRepository = new NotesRepository();
+
+  try {
+    const { cognitoId, id } = data;
+    await notesRepository.deleteById(cognitoId, id);
+
+    return {
+      message: 'Note deleted successfully',
+    };
+  } catch (error: any) {
     return {
       statusCode: error.statusCode ?? 500,
       body: JSON.stringify({

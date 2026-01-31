@@ -1,10 +1,9 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { AuthenticatedRequestContext, resolveUserId } from '../config/utils.js';
+import { resolveUserId } from '../config/utils.js';
 import { findByUser } from '../services/notes.service.js';
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
   try {
-    const requestContext = event.requestContext as AuthenticatedRequestContext;
     const cognitoId = resolveUserId(event);
 
     if (!cognitoId) {
