@@ -44,6 +44,12 @@ functions:
       - http:
           path: /notes
           method: get
+  update:
+    handler: src/handlers/update.handler
+    events:
+      - http:
+          path: /notes/{id}
+          method: put
 
 resources:
   Resources:

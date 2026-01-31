@@ -1,6 +1,7 @@
-import { create, findByUser } from '../notes.service.js';
-import { NotesRepository } from '../../repositories/notes.repository.js';
+import { create, findByUser, updateByUser, UpdateNoteInput } from '../notes.service.js';
+import { Note, NotesRepository } from '../../repositories/notes.repository.js';
 import { randomUUID } from 'crypto';
+import { resolveUserId } from '../../config/utils.js';
 
 jest.mock('../../repositories/notes.repository.js');
 jest.mock('crypto');
@@ -129,6 +130,96 @@ describe('Notes Service - findByUser', () => {
     });
 
     const result = await findByUser(cognitoId);
+
+    expect(result).toEqual({
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'DB error',
+      }),
+    });
+  });
+});
+
+describe('Notes Service - updateByUser', () => {
+  const mockUpdateByUser = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    (NotesRepository as jest.Mock).mockImplementation(() => ({
+      updateByUser: mockUpdateByUser,
+    }));
+  });
+
+  it('should update a note successfully', async () => {
+    const input: UpdateNoteInput = {
+      cognitoId: resolveUserId()!,
+      id: 'note-123',
+      title: 'Updated title',
+      content: 'Updated content',
+    };
+
+    mockUpdateByUser.mockResolvedValue({
+      id: input.id,
+      cognitoId: input.cognitoId,
+      title: input.title,
+      content: input.content,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: expect.any(String),
+    });
+
+    const result = await updateByUser(input);
+
+    expect(mockUpdateByUser).toHaveBeenCalledTimes(1);
+
+    expect(mockUpdateByUser).toHaveBeenCalledWith(input.cognitoId, input.id, {
+      title: input.title,
+      content: input.content,
+    });
+
+    expect(result).toMatchObject({
+      id: input.id,
+      cognitoId: input.cognitoId,
+      title: input.title,
+      content: input.content,
+    });
+  });
+
+  it('should update only title (partial update)', async () => {
+    const input: UpdateNoteInput = {
+      cognitoId: resolveUserId()!,
+      id: 'note-123',
+      title: 'Updated title',
+    };
+
+    mockUpdateByUser.mockResolvedValue({
+      id: input.id,
+      cognitoId: input.cognitoId,
+      title: input.title,
+      content: 'Existing content',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: expect.any(String),
+    });
+
+    const result = (await updateByUser(input)) as Note;
+
+    expect(mockUpdateByUser).toHaveBeenCalledWith(input.cognitoId, input.id, {
+      title: input.title,
+    });
+
+    expect(result?.title).toBe(input.title);
+  });
+
+  it('should return an error response when repository fails', async () => {
+    const input: UpdateNoteInput = {
+      cognitoId: resolveUserId()!,
+      id: 'note-123',
+      title: 'Updated title',
+    };
+
+    mockUpdateByUser.mockRejectedValue(new Error('DB error'));
+
+    const result = await updateByUser(input as any);
 
     expect(result).toEqual({
       statusCode: 500,

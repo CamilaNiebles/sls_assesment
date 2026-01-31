@@ -76,6 +76,10 @@ describe('NotesRepository', () => {
   });
 
   describe('update', () => {
+    const getUpdateCommandInput = () => {
+      const call = sendMock.mock.calls[0][0] as UpdateCommand;
+      return call.input;
+    };
     it('should update a note', async () => {
       sendMock.mockResolvedValue({
         Attributes: note,
@@ -86,7 +90,35 @@ describe('NotesRepository', () => {
         content: note.content,
       });
 
+      expect(sendMock).toHaveBeenCalledTimes(1);
       expect(sendMock).toHaveBeenCalledWith(expect.any(UpdateCommand));
+
+      const input = getUpdateCommandInput();
+
+      expect(input).toMatchObject({
+        TableName: expect.any(String),
+        Key: {
+          cognitoId: note.cognitoId,
+          id: note.id,
+        },
+        ReturnValues: 'ALL_NEW',
+      });
+
+      expect(input.UpdateExpression).toContain('#title = :title');
+      expect(input.UpdateExpression).toContain('#content = :content');
+      expect(input.UpdateExpression).toContain('#updatedAt = :updatedAt');
+
+      expect(input.ExpressionAttributeNames).toMatchObject({
+        '#title': 'title',
+        '#content': 'content',
+        '#updatedAt': 'updatedAt',
+      });
+
+      expect(input.ExpressionAttributeValues).toMatchObject({
+        ':title': note.title,
+        ':content': note.content,
+        ':updatedAt': expect.any(String),
+      });
 
       expect(result).toEqual(note);
     });
