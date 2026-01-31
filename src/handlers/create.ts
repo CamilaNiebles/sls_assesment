@@ -1,7 +1,7 @@
 import {
   APIGatewayEventRequestContextV2,
   APIGatewayProxyEventV2,
-  APIGatewayProxyResultV2,
+  APIGatewayProxyResult,
 } from 'aws-lambda';
 import { create } from '../services/notes.service.js';
 import { randomUUID } from 'crypto';
@@ -19,7 +19,7 @@ interface AuthenticatedRequestContext extends APIGatewayEventRequestContextV2 {
   authorizer?: JwtAuthorizerContext;
 }
 
-export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
+export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResult> => {
   const data = validateData(event);
   const createdNote = await create(data);
   return {
