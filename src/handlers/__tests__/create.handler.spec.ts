@@ -2,6 +2,7 @@ import { create } from '../../services/notes.service.js';
 import { randomUUID } from 'crypto';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { handler } from '../create.js';
+import { resolveUserId } from '../../config/utils.js';
 
 jest.mock('../../services/notes.service.js');
 jest.mock('crypto');
@@ -9,7 +10,7 @@ jest.mock('crypto');
 describe('Notes Handler - create', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (randomUUID as jest.Mock).mockReturnValue('cognito-123');
+    (randomUUID as jest.Mock).mockReturnValue(resolveUserId());
   });
 
   const baseEvent = {
@@ -25,7 +26,7 @@ describe('Notes Handler - create', () => {
   it('should return 201 when note is created', async () => {
     (create as jest.Mock).mockResolvedValue({
       id: 'note-1',
-      cognitoId: 'cognito-123',
+      cognitoId: resolveUserId(baseEvent as APIGatewayProxyEventV2),
       title: 'Test',
       content: 'Content',
       createdAt: 'now',
@@ -43,7 +44,7 @@ describe('Notes Handler - create', () => {
     const result = await handler(event);
 
     expect(create).toHaveBeenCalledWith({
-      cognitoId: 'cognito-123',
+      cognitoId: resolveUserId(event),
       title: 'Test',
       content: 'Content',
     });

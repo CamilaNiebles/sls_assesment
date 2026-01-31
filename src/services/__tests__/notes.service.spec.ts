@@ -1,4 +1,4 @@
-import { create } from '../notes.service.js';
+import { create, findByUser } from '../notes.service.js';
 import { NotesRepository } from '../../repositories/notes.repository.js';
 import { randomUUID } from 'crypto';
 
@@ -65,6 +65,70 @@ describe('Notes Service - create', () => {
     mockCreate.mockRejectedValue(new Error('DB error'));
 
     const result = await create(input);
+
+    expect(result).toEqual({
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'DB error',
+      }),
+    });
+  });
+});
+
+describe('Notes Service - findByUser', () => {
+  const mockFindByUser = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    (NotesRepository as jest.Mock).mockImplementation(() => ({
+      findByUser: mockFindByUser,
+    }));
+  });
+
+  it('should return notes for a given cognitoId', async () => {
+    const cognitoId = 'cognito-123';
+
+    const notes = [
+      {
+        id: 'note-1',
+        cognitoId,
+        title: 'Note 1',
+        content: 'Content 1',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ];
+
+    mockFindByUser.mockResolvedValue(notes);
+
+    const result = await findByUser(cognitoId);
+
+    expect(mockFindByUser).toHaveBeenCalledTimes(1);
+    expect(mockFindByUser).toHaveBeenCalledWith(cognitoId);
+    expect(result).toEqual(notes);
+  });
+
+  it('should return 400 error when cognitoId is missing', async () => {
+    const result = await findByUser('');
+
+    expect(result).toEqual({
+      statusCode: 400,
+      body: JSON.stringify({
+        message: 'cognitoId is required',
+      }),
+    });
+  });
+
+  it('should return an error response when repository fails', async () => {
+    const cognitoId = 'cognito-123';
+
+    mockFindByUser.mockRejectedValue({
+      statusCode: 500,
+      message: 'DB error',
+    });
+
+    const result = await findByUser(cognitoId);
 
     expect(result).toEqual({
       statusCode: 500,
