@@ -1,4 +1,11 @@
-import { create, findByUser, updateByUser, UpdateNoteInput } from '../notes.service.js';
+import {
+  create,
+  deleteById,
+  DeleteNoteInput,
+  findByUser,
+  updateByUser,
+  UpdateNoteInput,
+} from '../notes.service.js';
 import { Note, NotesRepository } from '../../repositories/notes.repository.js';
 import { randomUUID } from 'crypto';
 import { resolveUserId } from '../../config/utils.js';
@@ -220,6 +227,54 @@ describe('Notes Service - updateByUser', () => {
     mockUpdateByUser.mockRejectedValue(new Error('DB error'));
 
     const result = await updateByUser(input as any);
+
+    expect(result).toEqual({
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'DB error',
+      }),
+    });
+  });
+});
+
+describe('Notes Service - deleteById', () => {
+  const mockDeleteById = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    (NotesRepository as jest.Mock).mockImplementation(() => ({
+      deleteById: mockDeleteById,
+    }));
+  });
+
+  it('should delete a note successfully', async () => {
+    const input: DeleteNoteInput = {
+      cognitoId: resolveUserId()!,
+      id: 'note-123',
+    };
+
+    mockDeleteById.mockResolvedValue(undefined);
+
+    const result = await deleteById(input);
+
+    expect(mockDeleteById).toHaveBeenCalledTimes(1);
+    expect(mockDeleteById).toHaveBeenCalledWith(input.cognitoId, input.id);
+
+    expect(result).toEqual({
+      message: 'Note deleted successfully',
+    });
+  });
+
+  it('should return an error response when repository fails', async () => {
+    const input: DeleteNoteInput = {
+      cognitoId: resolveUserId()!,
+      id: 'note-123',
+    };
+
+    mockDeleteById.mockRejectedValue(new Error('DB error'));
+
+    const result = await deleteById(input);
 
     expect(result).toEqual({
       statusCode: 500,
