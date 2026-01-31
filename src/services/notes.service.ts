@@ -38,3 +38,29 @@ export const create = async (data: newNote) => {
     };
   }
 };
+
+export const findByUser = async (cognitoId: string) => {
+  const notesRepository = new NotesRepository();
+
+  try {
+    if (!cognitoId) {
+      throw {
+        statusCode: 400,
+        message: 'cognitoId is required',
+      };
+    }
+
+    const notes = await notesRepository.findByUser(cognitoId);
+
+    return notes;
+  } catch (error: any) {
+    console.error('Find notes by user failed:', error);
+
+    return {
+      statusCode: error.statusCode ?? 500,
+      body: JSON.stringify({
+        message: error.message ?? 'Internal server error',
+      }),
+    };
+  }
+};
