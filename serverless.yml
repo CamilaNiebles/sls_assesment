@@ -32,9 +32,12 @@ functions:
       - http:
           path: /health
           method: get
-  
-  custom:
-  notesTableName: notes-api-notes-${sls:stage}
+  create:
+    handler: src/handlers/create.handler
+    events:
+      - http:
+          path: /notes
+          method: post
 
 resources:
   Resources:
