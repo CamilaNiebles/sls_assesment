@@ -58,9 +58,30 @@ export class NotesRepository {
   async updateByUser(
     cognitoId: string,
     id: string,
-    updates: Pick<Note, 'title' | 'content'>,
+    updates: Partial<Pick<Note, 'title' | 'content'>>,
   ): Promise<Note> {
     try {
+      const updateExpressions: string[] = [];
+      const expressionAttributeValues: Record<string, any> = {};
+      const expressionAttributeNames: Record<string, string> = {};
+
+      if (updates.title !== undefined) {
+        updateExpressions.push('#title = :title');
+        expressionAttributeValues[':title'] = updates.title;
+        expressionAttributeNames['#title'] = 'title';
+      }
+
+      if (updates.content !== undefined) {
+        updateExpressions.push('#content = :content');
+        expressionAttributeValues[':content'] = updates.content;
+        expressionAttributeNames['#content'] = 'content';
+      }
+
+      // always update updatedAt
+      updateExpressions.push('#updatedAt = :updatedAt');
+      expressionAttributeValues[':updatedAt'] = new Date().toISOString();
+      expressionAttributeNames['#updatedAt'] = 'updatedAt';
+
       const result = await this.docClient.send(
         new UpdateCommand({
           TableName: env.NOTES_TABLE_NAME,
@@ -68,16 +89,9 @@ export class NotesRepository {
             cognitoId,
             id,
           },
-          UpdateExpression: `
-            SET title = :title,
-                content = :content,
-                updatedAt = :updatedAt
-          `,
-          ExpressionAttributeValues: {
-            ':title': updates.title,
-            ':content': updates.content,
-            ':updatedAt': new Date().toISOString(),
-          },
+          UpdateExpression: `SET ${updateExpressions.join(', ')}`,
+          ExpressionAttributeNames: expressionAttributeNames,
+          ExpressionAttributeValues: expressionAttributeValues,
           ReturnValues: 'ALL_NEW',
         }),
       );

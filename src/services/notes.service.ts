@@ -7,6 +7,13 @@ interface newNote {
   content: string;
 }
 
+export interface UpdateNoteInput {
+  cognitoId: string;
+  id: string;
+  title?: string;
+  content?: string;
+}
+
 export const create = async (data: newNote) => {
   const notesRepository = new NotesRepository();
 
@@ -55,6 +62,34 @@ export const findByUser = async (cognitoId: string) => {
     return notes;
   } catch (error: any) {
     console.error('Find notes by user failed:', error);
+
+    return {
+      statusCode: error.statusCode ?? 500,
+      body: JSON.stringify({
+        message: error.message ?? 'Internal server error',
+      }),
+    };
+  }
+};
+
+export const updateByUser = async (data: UpdateNoteInput) => {
+  const notesRepository = new NotesRepository();
+
+  try {
+    const { cognitoId, id, title, content } = data;
+
+    if (!cognitoId || !id) {
+      throw {
+        statusCode: 400,
+        message: 'cognitoId and id are required',
+      };
+    }
+
+    const updatedNote = await notesRepository.updateByUser(cognitoId, id, { title, content });
+
+    return updatedNote;
+  } catch (error: any) {
+    console.error('Update note failed:', error);
 
     return {
       statusCode: error.statusCode ?? 500,
