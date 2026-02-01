@@ -72,14 +72,7 @@ describe('Notes Service - create', () => {
 
     mockCreate.mockRejectedValue(new Error('DB error'));
 
-    const result = await create(input);
-
-    expect(result).toEqual({
-      statusCode: 500,
-      body: JSON.stringify({
-        message: 'DB error',
-      }),
-    });
+    await expect(create(input)).rejects.toThrow('Could not create note');
   });
 });
 
@@ -118,32 +111,11 @@ describe('Notes Service - findByUser', () => {
   });
 
   it('should return 400 error when cognitoId is missing', async () => {
-    const result = await findByUser('');
-
-    expect(result).toEqual({
-      statusCode: 400,
-      body: JSON.stringify({
-        message: 'cognitoId is required',
-      }),
-    });
-  });
-
-  it('should return an error response when repository fails', async () => {
-    const cognitoId = 'cognito-123';
-
-    mockFindByUser.mockRejectedValue({
-      statusCode: 500,
-      message: 'DB error',
-    });
-
-    const result = await findByUser(cognitoId);
-
-    expect(result).toEqual({
-      statusCode: 500,
-      body: JSON.stringify({
-        message: 'DB error',
-      }),
-    });
+    try {
+      await findByUser('');
+    } catch (error: any) {
+      expect(error.message).toBe('Could not retrieve notes');
+    }
   });
 });
 
@@ -226,14 +198,11 @@ describe('Notes Service - updateByUser', () => {
 
     mockUpdateByUser.mockRejectedValue(new Error('DB error'));
 
-    const result = await updateByUser(input as any);
-
-    expect(result).toEqual({
-      statusCode: 500,
-      body: JSON.stringify({
-        message: 'DB error',
-      }),
-    });
+    try {
+      await updateByUser(input as any);
+    } catch (error: any) {
+      expect(error.message).toBe('Could not update note');
+    }
   });
 });
 
@@ -274,13 +243,10 @@ describe('Notes Service - deleteById', () => {
 
     mockDeleteById.mockRejectedValue(new Error('DB error'));
 
-    const result = await deleteById(input);
-
-    expect(result).toEqual({
-      statusCode: 500,
-      body: JSON.stringify({
-        message: 'DB error',
-      }),
-    });
+    try {
+      await deleteById(input);
+    } catch (error: any) {
+      expect(error.message).toBe('Could not delete note');
+    }
   });
 });

@@ -123,6 +123,30 @@ describe('NotesRepository', () => {
       expect(result).toEqual(note);
     });
 
+    it('updates only title when content is undefined', async () => {
+      sendMock.mockResolvedValueOnce({
+        Attributes: { id: '1', title: 'new', updatedAt: 'now' },
+      });
+
+      await repository.updateByUser('user-1', '1', { title: 'new' });
+      const input = sendMock.mock.calls[0][0].input;
+
+      expect(input.UpdateExpression).toContain('#title');
+      expect(input.UpdateExpression).not.toContain('#content');
+    });
+
+    it('updates only content when title is undefined', async () => {
+      sendMock.mockResolvedValueOnce({
+        Attributes: { id: '1', content: 'new', updatedAt: 'now' },
+      });
+
+      await repository.updateByUser('user-1', '1', { content: 'new' });
+      const input = sendMock.mock.calls[0][0].input;
+
+      expect(input.UpdateExpression).toContain('#content');
+      expect(input.UpdateExpression).not.toContain('#title');
+    });
+
     it('should throw when update fails', async () => {
       sendMock.mockRejectedValue(new Error('Update failed'));
 

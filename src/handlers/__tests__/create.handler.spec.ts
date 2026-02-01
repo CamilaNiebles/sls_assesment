@@ -1,8 +1,6 @@
 import { create } from '../../services/notes.service.js';
-import { randomUUID } from 'crypto';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { handler } from '../create.js';
-import { resolveUserId } from '../../config/utils.js';
 
 jest.mock('../../services/notes.service.js');
 jest.mock('crypto');
@@ -10,23 +8,19 @@ jest.mock('crypto');
 describe('Notes Handler - create', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (randomUUID as jest.Mock).mockReturnValue(resolveUserId());
   });
-
-  const baseEvent = {
-    version: '2.0',
-    routeKey: 'POST /notes',
-    rawPath: '/notes',
-    rawQueryString: '',
-    headers: {},
-    requestContext: {},
-    isBase64Encoded: false,
-  } as Partial<APIGatewayProxyEventV2>;
+  const mockEvent = {
+    requestContext: {
+      authorizer: {
+        principalId: 'cognito-123',
+      },
+    },
+  } as unknown as APIGatewayProxyEventV2;
 
   it('should return 201 when note is created', async () => {
     (create as jest.Mock).mockResolvedValue({
       id: 'note-1',
-      cognitoId: resolveUserId(baseEvent as APIGatewayProxyEventV2),
+      cognitoId: 'cognito-123',
       title: 'Test',
       content: 'Content',
       createdAt: 'now',
@@ -34,7 +28,7 @@ describe('Notes Handler - create', () => {
     });
 
     const event = {
-      ...baseEvent,
+      ...mockEvent,
       body: JSON.stringify({
         title: 'Test',
         content: 'Content',
@@ -44,7 +38,7 @@ describe('Notes Handler - create', () => {
     const result = await handler(event);
 
     expect(create).toHaveBeenCalledWith({
-      cognitoId: resolveUserId(event),
+      cognitoId: 'cognito-123',
       title: 'Test',
       content: 'Content',
     });
@@ -55,7 +49,7 @@ describe('Notes Handler - create', () => {
 
   it('should return 400 if body is missing', async () => {
     const event = {
-      ...baseEvent,
+      ...mockEvent,
       body: undefined,
     } as APIGatewayProxyEventV2;
 
@@ -67,7 +61,7 @@ describe('Notes Handler - create', () => {
 
   it('should return 400 if body is invalid JSON', async () => {
     const event = {
-      ...baseEvent,
+      ...mockEvent,
       body: '{ invalid json',
     } as APIGatewayProxyEventV2;
 
@@ -79,7 +73,7 @@ describe('Notes Handler - create', () => {
 
   it('should return 400 if title or content is missing', async () => {
     const event = {
-      ...baseEvent,
+      ...mockEvent,
       body: JSON.stringify({ title: 'Only title' }),
     } as APIGatewayProxyEventV2;
 
@@ -96,7 +90,7 @@ describe('Notes Handler - create', () => {
     });
 
     const event = {
-      ...baseEvent,
+      ...mockEvent,
       body: JSON.stringify({
         title: 'Test',
         content: 'Content',

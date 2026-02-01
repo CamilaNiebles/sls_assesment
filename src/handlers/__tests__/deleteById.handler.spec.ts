@@ -1,5 +1,4 @@
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
-import { resolveUserId } from '../../config/utils.js';
 import { deleteById } from '../../services/notes.service.js';
 import { handler } from '../deleteById.js';
 
@@ -7,29 +6,27 @@ jest.mock('../../config/utils.js');
 jest.mock('../../services/notes.service.js');
 
 describe('Delete Note Handler', () => {
-  const mockResolveUserId = resolveUserId as jest.Mock;
   const mockDeleteById = deleteById as jest.Mock;
 
-  const baseEvent: Partial<APIGatewayProxyEventV2> = {
-    version: '2.0',
-    routeKey: 'DELETE /notes/{id}',
-    rawPath: '/notes/note-123',
+  const mockEvent = {
     pathParameters: {
       id: 'note-123',
     },
-    headers: {},
-    requestContext: {} as any,
-  };
+    requestContext: {
+      authorizer: {
+        principalId: 'cognito-123',
+      },
+    },
+  } as unknown as APIGatewayProxyEventV2;
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should delete a note successfully', async () => {
-    mockResolveUserId.mockReturnValue('cognito-123');
     mockDeleteById.mockResolvedValue(undefined);
 
-    const result = await handler(baseEvent as APIGatewayProxyEventV2);
+    const result = await handler(mockEvent as APIGatewayProxyEventV2);
 
     expect(mockDeleteById).toHaveBeenCalledTimes(1);
     expect(mockDeleteById).toHaveBeenCalledWith({
@@ -48,25 +45,9 @@ describe('Delete Note Handler', () => {
     });
   });
 
-  it('should return 401 when user is not authenticated', async () => {
-    mockResolveUserId.mockReturnValue(null);
-
-    const result = await handler(baseEvent as APIGatewayProxyEventV2);
-
-    expect(mockDeleteById).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      statusCode: 401,
-      body: JSON.stringify({
-        message: 'Unauthorized',
-      }),
-    });
-  });
-
   it('should return 400 when note id is missing', async () => {
-    mockResolveUserId.mockReturnValue('cognito-123');
-
     const eventWithoutId = {
-      ...baseEvent,
+      ...mockEvent,
       pathParameters: {},
     };
 
@@ -82,10 +63,9 @@ describe('Delete Note Handler', () => {
   });
 
   it('should return 500 when deleteById throws an error', async () => {
-    mockResolveUserId.mockReturnValue('cognito-123');
     mockDeleteById.mockRejectedValue(new Error('DB error'));
 
-    const result = await handler(baseEvent as APIGatewayProxyEventV2);
+    const result = await handler(mockEvent as APIGatewayProxyEventV2);
 
     expect(mockDeleteById).toHaveBeenCalledTimes(1);
     expect(result).toEqual({

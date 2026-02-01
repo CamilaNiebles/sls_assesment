@@ -23,9 +23,16 @@ provider:
   environment:
     NODE_ENV: ${self:provider.stage}
     NOTES_TABLE_NAME: ${self:service}-notes-${sls:stage}
-    IS_OFFLINE: false
+    IS_OFFLINE: ${env:IS_OFFLINE, 'false'}
+    COGNITO_USER_POOL_ID:
+      Ref: CognitoUserPool
+
 
 functions:
+
+  authorizer:
+    handler: src/handlers/authorizer.handler
+
   health:
     handler: src/handlers/health.handler
     events:
@@ -38,24 +45,36 @@ functions:
       - http:
           path: /notes
           method: post
+          authorizer: 
+            name: authorizer
+            type: TOKEN
   getById:
     handler: src/handlers/getById.handler
     events:
       - http:
           path: /notes
           method: get
+          authorizer: 
+            name: authorizer
+            type: TOKEN
   update:
     handler: src/handlers/update.handler
     events:
       - http:
           path: /notes/{id}
           method: put
+          authorizer: 
+            name: authorizer
+            type: TOKEN
   deleteById:
     handler: src/handlers/deleteById.handler
     events:
       - http:
           path: /notes/{id}
           method: delete
+          authorizer: 
+            name: authorizer
+            type: TOKEN
 
 resources:
   Resources:
@@ -79,7 +98,47 @@ resources:
             Value: ${self:service}
           - Key: stage
             Value: ${sls:stage}
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: notes-api-${self:provider.stage}-user-pool
+        AutoVerifiedAttributes:
+          - email
+        UsernameAttributes:
+          - email
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireUppercase: true
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireSymbols: false
 
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: notes-api-${self:provider.stage}-client
+        UserPoolId:
+          Ref: CognitoUserPool
+        GenerateSecret: false
+        ExplicitAuthFlows:
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+        SupportedIdentityProviders:
+          - COGNITO
+
+  Outputs:
+    UserPoolId:
+      Value:
+        Ref: CognitoUserPool
+      Export:
+        Name: ${self:service}-${self:provider.stage}-UserPoolId
+
+    UserPoolClientId:
+      Value:
+        Ref: CognitoUserPoolClient
+      Export:
+        Name: ${self:service}-${self:provider.stage}-UserPoolClientId
 
 plugins:
   - serverless-offline

@@ -41,13 +41,7 @@ export const create = async (data: newNote) => {
     return createdNote;
   } catch (error: any) {
     console.error('Create note failed:', error);
-
-    return {
-      statusCode: error.statusCode ?? 500,
-      body: JSON.stringify({
-        message: error.message ?? 'Internal server error',
-      }),
-    };
+    throw new Error('Could not create note');
   }
 };
 
@@ -55,25 +49,12 @@ export const findByUser = async (cognitoId: string) => {
   const notesRepository = new NotesRepository();
 
   try {
-    if (!cognitoId) {
-      throw {
-        statusCode: 400,
-        message: 'cognitoId is required',
-      };
-    }
-
     const notes = await notesRepository.findByUser(cognitoId);
 
     return notes;
   } catch (error: any) {
     console.error('Find notes by user failed:', error);
-
-    return {
-      statusCode: error.statusCode ?? 500,
-      body: JSON.stringify({
-        message: error.message ?? 'Internal server error',
-      }),
-    };
+    throw new Error('Could not retrieve notes');
   }
 };
 
@@ -83,25 +64,12 @@ export const updateByUser = async (data: UpdateNoteInput) => {
   try {
     const { cognitoId, id, title, content } = data;
 
-    if (!cognitoId || !id) {
-      throw {
-        statusCode: 400,
-        message: 'cognitoId and id are required',
-      };
-    }
-
     const updatedNote = await notesRepository.updateByUser(cognitoId, id, { title, content });
 
     return updatedNote;
   } catch (error: any) {
     console.error('Update note failed:', error);
-
-    return {
-      statusCode: error.statusCode ?? 500,
-      body: JSON.stringify({
-        message: error.message ?? 'Internal server error',
-      }),
-    };
+    throw new Error('Could not update note');
   }
 };
 
@@ -116,11 +84,6 @@ export const deleteById = async (data: DeleteNoteInput) => {
       message: 'Note deleted successfully',
     };
   } catch (error: any) {
-    return {
-      statusCode: error.statusCode ?? 500,
-      body: JSON.stringify({
-        message: error.message ?? 'Internal server error',
-      }),
-    };
+    throw new Error('Could not delete note');
   }
 };

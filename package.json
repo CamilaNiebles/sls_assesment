@@ -12,6 +12,10 @@
     "test:quick": "jest --changedSince=HEAD src --passWithNoTests",
     "test:coverage": "jest --coverage",
     "db:local:setup": "tsx src/scripts/create-local-table.ts",
+    "dev": "npx serverless offline --stage dev",
+    "deploy:dev": "npx serverless deploy --stage dev",
+    "deploy:prod": "npx serverless deploy --stage prod",
+    "logs": "npx serverless logs -f getNotes --tail",
     "prepare": "husky"
   },
   "repository": {
@@ -54,6 +58,8 @@
     "@aws-sdk/lib-dynamodb": "^3.978.0",
     "@aws-sdk/util-dynamodb": "^3.978.0",
     "dotenv": "^17.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "jwks-rsa": "^3.2.2",
     "serverless": "^4.31.2",
     "zod": "^4.3.6"
   }

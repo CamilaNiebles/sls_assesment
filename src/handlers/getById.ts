@@ -1,17 +1,11 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { resolveUserId } from '../config/utils.js';
 import { findByUser } from '../services/notes.service.js';
+import { AuthenticatedRequestContext } from '../config/utils.js';
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
   try {
-    const cognitoId = resolveUserId(event);
-
-    if (!cognitoId) {
-      return {
-        statusCode: 401,
-        body: JSON.stringify({ message: 'Unauthorized' }),
-      };
-    }
+    const context = event.requestContext as AuthenticatedRequestContext;
+    const cognitoId = context.authorizer?.principalId || '';
 
     const result = await findByUser(cognitoId);
     if ((result as any)?.statusCode) {

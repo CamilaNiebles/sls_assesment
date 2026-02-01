@@ -117,20 +117,4 @@ export class NotesRepository {
       throw new Error(`Failed to delete note by id: ${error}`);
     }
   }
-
-  async deleteByUser(cognitoId: string, id: string): Promise<void> {
-    try {
-      await this.docClient.send(
-        new DeleteCommand({
-          TableName: env.NOTES_TABLE_NAME,
-          Key: {
-            cognitoId,
-            id,
-          },
-        }),
-      );
-    } catch (error) {
-      throw new Error(`Failed to delete note: ${error}`);
-    }
-  }
 }

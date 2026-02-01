@@ -1,5 +1,5 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResult } from 'aws-lambda';
-import { resolveUserId } from '../config/utils.js';
+import { AuthenticatedRequestContext } from '../config/utils.js';
 import { deleteById } from '../services/notes.service.js';
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResult> => {
@@ -27,14 +27,8 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 };
 
 const validateData = (event: APIGatewayProxyEventV2) => {
-  const cognitoId = resolveUserId(event);
-
-  if (!cognitoId) {
-    throw {
-      statusCode: 401,
-      message: 'Unauthorized',
-    };
-  }
+  const context = event.requestContext as AuthenticatedRequestContext;
+  const cognitoId = context.authorizer?.principalId || '';
 
   const id = event.pathParameters?.id;
 
