@@ -1,8 +1,9 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResult } from 'aws-lambda';
 import { create } from '../services/notes.service.js';
-import { resolveUserId } from '../config/utils.js';
+import { AuthenticatedRequestContext } from '../config/utils.js';
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResult> => {
+  console.log('Create Note Event:', JSON.stringify(event));
   const data = validateData(event);
   const createdNote = await create(data);
   return {
@@ -15,14 +16,9 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 };
 
 const validateData = (event: APIGatewayProxyEventV2) => {
-  const cognitoId = resolveUserId(event);
-
-  if (!cognitoId) {
-    throw {
-      statusCode: 401,
-      message: 'Unauthorized',
-    };
-  }
+  const context = event.requestContext as AuthenticatedRequestContext;
+  const cognitoId = context.authorizer?.principalId || '';
+  let parsedBody: any;
 
   if (!event.body) {
     throw {
@@ -31,11 +27,9 @@ const validateData = (event: APIGatewayProxyEventV2) => {
     };
   }
 
-  let parsedBody: any;
-
   try {
     parsedBody = JSON.parse(event.body);
-  } catch {
+  } catch (error) {
     throw {
       statusCode: 400,
       message: 'Invalid JSON body',

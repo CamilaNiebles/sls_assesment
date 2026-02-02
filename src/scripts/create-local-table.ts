@@ -13,7 +13,7 @@ async function createTable() {
   try {
     await client.send(
       new CreateTableCommand({
-        TableName: 'notes-api-notes-dev',
+        TableName: 'notes-api-offline-notes-dev',
         BillingMode: 'PAY_PER_REQUEST',
         AttributeDefinitions: [
           { AttributeName: 'id', AttributeType: 'S' },
