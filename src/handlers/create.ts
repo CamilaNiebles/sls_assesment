@@ -3,6 +3,7 @@ import { create } from '../services/notes.service.js';
 import { AuthenticatedRequestContext } from '../config/utils.js';
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResult> => {
+  console.log('Create Note Event:', JSON.stringify(event));
   const data = validateData(event);
   const createdNote = await create(data);
   return {
